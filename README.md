@@ -196,14 +196,14 @@ We built TradingAgents with LangGraph to ensure flexibility and modularity. The 
 At a high level, both interfaces run the same graph pipeline and produce the same type of final decision.
 
 1. **Environment and configuration are loaded first**
-   - Importing `tradingagents` loads `.env` and `.env.enterprise` (without overriding already-exported shell vars).
+   - Importing `tradingagents` loads `.env` and `.env.enterprise` (without overwriting already-exported shell vars).
    - `DEFAULT_CONFIG` is created, then `TRADINGAGENTS_*` environment overrides are applied (for provider/model/debate/checkpoint/output settings, etc.).
    - Runtime then applies interface-level overrides:
      - **CLI**: interactive selections (provider, models, analyst set, research depth, language, checkpoint flag) overwrite `DEFAULT_CONFIG.copy()`.
      - **Python API**: caller passes `config` into `TradingAgentsGraph(...)` (typically from `DEFAULT_CONFIG.copy()` plus code-level edits).
 
 2. **The graph is assembled with selected analysts**
-   - Analyst nodes are included only for selected roles (`market`, `social`/sentiment, `news`, `fundamentals`) and connected in the selected order.
+   - Analyst nodes are included only for selected roles (`market`, `social` (sentiment), `news`, `fundamentals`) and connected in the selected order.
    - Each analyst can loop through tool calls until complete, then hand off to the next stage.
    - LLM clients are built from the configured provider/models, including provider-specific reasoning controls (OpenAI effort, Gemini thinking level, Claude effort).
 
@@ -217,7 +217,7 @@ At a high level, both interfaces run the same graph pipeline and produce the sam
 4. **Decision extraction and persistence**
    - Final decision text is normalized by `SignalProcessor.process_signal(...)` into the actionable signal.
    - Run artifacts are persisted:
-      - Python API state log: `results_dir/<ticker>/TradingAgentsStrategy_logs/full_states_log_<date>.json`
+      - Python API state log: `results_dir/<ticker>/TradingAgentsStrategy_logs/full_states_log_<trade_date>.json` (`trade_date` format: `YYYY-MM-DD`)
       - CLI run artifacts: `results_dir/<ticker>/<analysis_date>/` (for streamed logs and report files)
       - decision-memory entry for later reflection
       - optional checkpoint state per ticker when checkpoint mode is enabled
