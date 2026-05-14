@@ -191,10 +191,10 @@ An interface will appear showing results as they load, letting you track the age
 
 We built TradingAgents with LangGraph to ensure flexibility and modularity. The framework supports multiple LLM providers: OpenAI, Google, Anthropic, xAI, DeepSeek, Qwen (Alibaba DashScope, international and China endpoints), GLM (Zhipu), MiniMax (global + China), OpenRouter, Ollama for local models, and Azure OpenAI for enterprise.
 
-### End-to-End Execution Flow (CLI + Python API)
+### End-to-End Execution Flow (CLI and Python API)
 
 At a high level, both interfaces run the same graph pipeline and produce the same type of final decision.
-In this document, CLI uses the label `analysis_date` and the Python API uses `trade_date`; both represent the same `YYYY-MM-DD` analysis day.
+TradingAgents uses the label `analysis_date` in the CLI and `trade_date` in the Python API; both represent the same `YYYY-MM-DD` analysis day.
 
 1. **Environment and configuration are loaded first**
    - Importing `tradingagents` loads `.env` and `.env.enterprise` (without overwriting already-exported shell vars).
@@ -210,7 +210,7 @@ In this document, CLI uses the label `analysis_date` and the Python API uses `tr
 
 3. **Execution order through roles is deterministic**
    - **Analyst Team** (selected analysts in sequence)
-   - **Research debate** (`Bull Researcher` ↔ `Bear Researcher` for configured rounds) → **Research Manager**
+   - **Research debate** (iterative `Bull Researcher` ↔ `Bear Researcher` turns for configured rounds) → **Research Manager**
    - **Trader**
    - **Risk debate** (`Aggressive` → `Conservative` → `Neutral`, repeating for configured rounds) → **Portfolio Manager**
    - Portfolio Manager output is the final decision text that downstream processing interprets.
