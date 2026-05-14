@@ -217,10 +217,11 @@ At a high level, both interfaces run the same graph pipeline and produce the sam
 4. **Decision extraction and persistence**
    - Final decision text is normalized by `SignalProcessor.process_signal(...)` into the actionable signal.
    - Run artifacts are persisted:
-      - JSON state log under `results_dir/<ticker>/TradingAgentsStrategy_logs/` (Python API) and `results_dir/<ticker>/<date>/` for streamed CLI artifacts
+      - Python API state log: `results_dir/<ticker>/TradingAgentsStrategy_logs/full_states_log_<date>.json`
+      - CLI run artifacts: `results_dir/<ticker>/<analysis_date>/` (for streamed logs and report files)
       - decision-memory entry for later reflection
       - optional checkpoint state per ticker when checkpoint mode is enabled
-   - In CLI runs, users can also export a structured report bundle (`1_analysts` → `5_portfolio` + `complete_report.md`).
+   - In CLI runs, users can also export a structured report bundle with ordered section folders (`1_analysts`, `2_research`, `3_trading`, `4_risk`, `5_portfolio`) plus `complete_report.md`.
 
 5. **Interface-specific run style**
    - **CLI (`tradingagents analyze`)** streams node-by-node progress with live status, messages, tool calls, token stats, and incremental report sections.
