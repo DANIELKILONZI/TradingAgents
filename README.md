@@ -191,6 +191,43 @@ An interface will appear showing results as they load, letting you track the age
 
 We built TradingAgents with LangGraph to ensure flexibility and modularity. The framework supports multiple LLM providers: OpenAI, Google, Anthropic, xAI, DeepSeek, Qwen (Alibaba DashScope, international and China endpoints), GLM (Zhipu), MiniMax (global + China), OpenRouter, Ollama for local models, and Azure OpenAI for enterprise.
 
+### End-to-End Execution Flow (CLI and Python API)
+
+At a high level, both interfaces run the same graph pipeline and produce the same type of final decision.
+TradingAgents uses the label `analysis_date` in the CLI and `trade_date` in the Python API; both represent the same `YYYY-MM-DD` analysis day.
+
+1. **Environment and configuration are loaded first**
+   - Importing `tradingagents` loads `.env` and `.env.enterprise` (without overwriting already-exported shell vars).
+   - `DEFAULT_CONFIG` is created, then `TRADINGAGENTS_*` environment overrides are applied (for provider/model/debate/checkpoint/output settings, etc.).
+   - Runtime then applies interface-level overrides:
+     - **CLI**: interactive selections (provider, models, analyst set, research depth, language, checkpoint flag) overwrite `DEFAULT_CONFIG.copy()`.
+     - **Python API**: caller passes `config` into `TradingAgentsGraph(...)` (typically from `DEFAULT_CONFIG.copy()` plus code-level edits).
+
+2. **The graph is assembled with selected analysts**
+   - Analyst nodes are included only for selected roles (`market`, `social`, `news`, `fundamentals`) and connected in the selected order.
+   - Each analyst can loop through tool calls until complete, then hand off to the next stage.
+   - LLM clients are built from the configured provider/models, including provider-specific reasoning controls (OpenAI effort, Gemini thinking level, Claude effort).
+
+3. **Execution order through roles is deterministic**
+   - **Analyst Team** (selected analysts in sequence)
+   - **Research debate** (iterative `Bull Researcher` ↔ `Bear Researcher` turns for configured rounds) → **Research Manager**
+   - **Trader**
+   - **Risk debate** (`Aggressive` → `Conservative` → `Neutral`, repeating for configured rounds) → **Portfolio Manager**
+   - Portfolio Manager output is the final decision text that downstream processing interprets.
+
+4. **Decision extraction and persistence**
+   - Final decision text is normalized by `SignalProcessor.process_signal(...)` into the actionable signal.
+   - Run artifacts are persisted:
+      - Python API state log: `results_dir/<ticker>/TradingAgentsStrategy_logs/full_states_log_<trade_date>.json` (`trade_date` format: `YYYY-MM-DD`)
+      - CLI run artifacts: `results_dir/<ticker>/<analysis_date>/` (`analysis_date` also uses `YYYY-MM-DD`; it is the same user-selected analysis day exposed under a CLI-specific name)
+      - decision-memory entry for later reflection
+      - optional checkpoint state per ticker when checkpoint mode is enabled
+   - In CLI runs, users can also export a structured report bundle with ordered section folders (`1_analysts`, `2_research`, `3_trading`, `4_risk`, `5_portfolio`) plus `complete_report.md`.
+
+5. **Interface-specific run style**
+   - **CLI (`tradingagents analyze`)** streams node-by-node progress with live status, messages, tool calls, token stats, and incremental report sections.
+   - **Python API (`TradingAgentsGraph(...).propagate(ticker, trade_date)`)** executes the same pipeline programmatically and returns `(final_state, decision)`.
+
 ### Python Usage
 
 To use TradingAgents inside your code, you can import the `tradingagents` module and initialize a `TradingAgentsGraph()` object. The `.propagate()` function will return a decision. You can run `main.py`, here's also a quick example:
