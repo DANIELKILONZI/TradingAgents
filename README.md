@@ -194,6 +194,7 @@ We built TradingAgents with LangGraph to ensure flexibility and modularity. The 
 ### End-to-End Execution Flow (CLI + Python API)
 
 At a high level, both interfaces run the same graph pipeline and produce the same type of final decision.
+In this document, CLI uses the label `analysis_date` and the Python API uses `trade_date`; both represent the same `YYYY-MM-DD` analysis day.
 
 1. **Environment and configuration are loaded first**
    - Importing `tradingagents` loads `.env` and `.env.enterprise` (without overwriting already-exported shell vars).
@@ -225,7 +226,7 @@ At a high level, both interfaces run the same graph pipeline and produce the sam
 
 5. **Interface-specific run style**
    - **CLI (`tradingagents analyze`)** streams node-by-node progress with live status, messages, tool calls, token stats, and incremental report sections.
-   - **Python API (`TradingAgentsGraph(...).propagate(ticker, date)`)** executes the same pipeline programmatically and returns `(final_state, decision)`.
+   - **Python API (`TradingAgentsGraph(...).propagate(ticker, trade_date)`)** executes the same pipeline programmatically and returns `(final_state, decision)`.
 
 ### Python Usage
 
