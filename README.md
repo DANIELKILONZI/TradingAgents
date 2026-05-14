@@ -217,7 +217,7 @@ At a high level, both interfaces run the same graph pipeline and produce the sam
 4. **Decision extraction and persistence**
    - Final decision text is normalized by `SignalProcessor.process_signal(...)` into the actionable signal.
    - Run artifacts are persisted:
-     - JSON state log under `results_dir/.../TradingAgentsStrategy_logs/`
+      - JSON state log under `results_dir/<ticker>/TradingAgentsStrategy_logs/` (Python API) and `results_dir/<ticker>/<date>/` for streamed CLI artifacts
      - decision-memory entry for later reflection
      - optional checkpoint state per ticker when checkpoint mode is enabled
    - In CLI runs, users can also export a structured report bundle (`1_analysts` → `5_portfolio` + `complete_report.md`).
