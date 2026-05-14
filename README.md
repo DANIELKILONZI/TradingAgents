@@ -203,7 +203,7 @@ At a high level, both interfaces run the same graph pipeline and produce the sam
      - **Python API**: caller passes `config` into `TradingAgentsGraph(...)` (typically from `DEFAULT_CONFIG.copy()` plus code-level edits).
 
 2. **The graph is assembled with selected analysts**
-   - Analyst nodes are included only for selected roles (`market`, `social` (sentiment), `news`, `fundamentals`) and connected in the selected order.
+   - Analyst nodes are included only for selected roles (`market`, `social`, `news`, `fundamentals`) and connected in the selected order.
    - Each analyst can loop through tool calls until complete, then hand off to the next stage.
    - LLM clients are built from the configured provider/models, including provider-specific reasoning controls (OpenAI effort, Gemini thinking level, Claude effort).
 
@@ -218,7 +218,7 @@ At a high level, both interfaces run the same graph pipeline and produce the sam
    - Final decision text is normalized by `SignalProcessor.process_signal(...)` into the actionable signal.
    - Run artifacts are persisted:
       - Python API state log: `results_dir/<ticker>/TradingAgentsStrategy_logs/full_states_log_<trade_date>.json` (`trade_date` format: `YYYY-MM-DD`)
-      - CLI run artifacts: `results_dir/<ticker>/<analysis_date>/` (`analysis_date` format: `YYYY-MM-DD`, for streamed logs and report files)
+      - CLI run artifacts: `results_dir/<ticker>/<analysis_date>/` (`analysis_date` also uses `YYYY-MM-DD`; it is the same user-selected analysis day exposed under a CLI-specific name)
       - decision-memory entry for later reflection
       - optional checkpoint state per ticker when checkpoint mode is enabled
    - In CLI runs, users can also export a structured report bundle with ordered section folders (`1_analysts`, `2_research`, `3_trading`, `4_risk`, `5_portfolio`) plus `complete_report.md`.
